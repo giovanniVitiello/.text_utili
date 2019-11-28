@@ -1,0 +1,40 @@
+1-spostarsi nella cartella del file di lavoro (utilizzare doppio slash //).
+2-git init
+3-andare su github e crere una repo (una cartella-progetto in remoto)
+4-copiare l'indirizzo remoto sul terminale locale (https://giovy@bitbucket.org/giovy/primarepo.git)
+5-scrivo sul terminale (git remote add origin https://giovy@bitbucket.org/giovy/primarepo.git)
+6-se voglio scaricare tutta la cartella da remoto ad esempio su un altro pc devo fare:
+git clone git@github.com:giovy10/dice_roll.git
+
+-----------
+
+1-git add . /*aggiunge tutto*/ oppure git add "nome file" /*aggiunge il file*/
+
+1 bis-se esiste il file README x prima cosa fare git pull origin master, in modo da includere il
+	file nella cartella locale, dopo di che possiamo fare il push !!!!!
+
+2-se si apportano modifiche in locale->
+3-git commit -m "commento sulla modifica" adesso il file è sulla cartella head locale
+4-git status  /*per controllare lo stato dei files*/
+5-git push del progetto su remoto (git push origin(nome del mio origin) master(nome del branch))
+6-se si apportano modifiche da remoto per scaricarle in locale il comando è:
+   git pull origin master.
+
+--------------CREARE UN BRANCH E UNA PULL REQUEST------------
+
+1-git checkout -b <nome branch per convenzione(feature/nome)>
+2-adesso ci siamo spostati sul branch feature/nome
+3-creare o inserisco i file necessari in questo branch (da locale)
+4-git status (controllo i nuovi file inseriti)
+5-git add . aggiungo i file in index pronti per essere committati
+6-git commit -m "" adesso il file è sulla cartella head locale
+7-git push del progetto su remoto (git push origin(nome del mio origin) feature/nome(branch))
+8-su remoto adesso avrò una pull request, che dovrà essere accettata
+9-dopo che è stata accettata, faccio il merge sul percorso master da remoto
+10-adesso faccio il git pull origin master e scarico il file nel master del locale
+11-mi ritroverò il file sul percorso master
+12-posso in teoria cancellare il percorso branch si prima
+13- il comando è : git branch -d feature/nome(branch)
+
+
+

@@ -1,0 +1,102 @@
+PRIMA LEZIONE YOUTUBE: https://www.youtube.com/watch?v=ObPPw7WWyUg&feature=youtu.be
+
+- Prima cosa, si dichiarano le sealed class Event e State nel ViewModel.
+- All'interno si mettono gli eventi(object Load : Event) e nella classe State gli stati (object onProgress-Success-Error)
+- Si scrive una funzione che manda gli eventi nell'activity esempio: fun send(event: Event) {
+        when (event) {
+            Event.Load -> TODO()
+        }
+- Nell'Activity si mandano questi eventi al viewModel richiamando la funzione all'interno dell'OnStart: viewModel.send(GiphyEvent.Load)
+- Nel ViewModel si inizializzano con il MutableLiveData gli stati: var state: MutableLiveData<State> = MutableLiveData() e poi saranno implementati all'interno
+ di una funzione loadContent che modifica questi diversi stati con state.value a seconda di cosa vogliamo inviare all'Activity.
+- Nella fun loadContent sicuramente subito viene inviato state.value = State.InProgress
+- L'activity passa sempre l'evento viewModel.send(GiphyEvent.Load) e riceve gli stati dal ViewModel
+- Nell'activity creiamo l'observe per vedere gli stati del ViewModel, si fa sempre nell'OnStart, e si chiama prima della funzione viewModel.send così sono
+ sicuro che prima ricevo i valori degli stati e poi gli mando gli eventi. Perchè è possibile che la funzione send sia così veloce che chiama gli eventi prima che io 
+riesca a ricevere gli stati con l'observer, cioè prima che io stia osservando gli stati. Quindi inizialmente si fa sempre l'Observe degli stati, poi si passano gli eventi.
+- Si apre un costrutto when all'interno dell'observer che vaglia i diversi state possibili da osservare che ovviamente sono 3 al momento: 
+inProgress-Success-Error..e in funzione dello stato do le istruzioni da eseguire. 
+- Quindi da qui dovrò costruire 3 funzioni showProgress showError e showSuccess, che verranno eseguite in funzione dello state che ci arriva.
+
+SECONDA LEZIONE YOUTUBE: https://www.youtube.com/watch?v=IhROPBJEDsI&feature=youtu.be
+
+- Solitamente adesso si procede così, si coprono tutti gli altri stati più semplici(Error) ed infine si implemente il caso del caricamento dati, che è il più lungo.
+- Quindi creo la funzione showError, che è semplicemente uno snackbar con un retry, e lo passo nel when(state) nel caso state is State.Error
+- Nella fun showError passo come parametro un error:Throwable
+- Nel ViewModel, quindi adesso dobbiamo adesso coprire il caso dell'errore, quindi sotto il state.vale=State.Progress, nella funzione loadContent, devo implementare 
+il caso di errore, quindi state.value = State.Error(Exception("prova")), per vedere se funziona.
+- Adesso dobbiamo coprire l'ultimo caso, il caricamento dati da network, quindi il caso Success.
+- Quindi creo un nuovo file e dentro metto quello che serve per le chiamate di rete. Quindi faccio gli implement del gradle con i retrofit.
+- Dentro metterò l'interfaccia RetrofitServiceInterface con il @GET e una funzione con i parametri di ingresso che sono le @query dell'indirizzo http dopo il 
+base url e come uscita nella funzione mettiamo una Call della classe di risposta che ci aspettiamo, in questo caso Call<Money>
+- Metterò la classe Service con dentro la val retrofit con la chiamata di rete: 
+-   val retrofit = Retrofit.Builder()
+            .addConverterFactory(GsonConverterFactory.create())
+            .baseUrl("https://openexchangerates.org/api/")
+            .client(client)
+            .build()
+        return retrofit.create<RetrofitServiceInterface>(RetrofitServiceInterface::class.java)
+- Creo una funzione che serve per ricevere la risposta. Utilizzo la funzione: fun getDataFromApi()
+- che all'interno prenderà i dati con l'enqueue che sovrascriverà l'onSuccess e l'onFailure.
+
+TERZA LEZIONE YOUTUBE: https://www.youtube.com/watch?v=naQ-GF2nSSc
+
+- All'interno dell'OnFailure (non riusciamo a fare la chiamata di rete, per un problema non del server)impostiamo un errore come risposta Log.d("Service", "error: $t")
+- Nell'onSuccess, se la risposta che otteniamo response.body() != null allora  prendiamo i dati dalla rete( response.body() ) altrimenti mostriamo response.errorbody().
+- Cioè significa che l'errore può essere lato server, quindi la chiamata viene effettuata correttamente, ma causa server non inviarci nulla.
+- Inizialmente si fanno le cose grezze per vedere se funziona. Quindi posso creare 2 variabili val success = response.body() e val error = response.errorBody()
+- Faccio 2 log.d e mostro in locale queste 2 possibilità, ossia metto i log.d("OnSuccess","ok") e log.d("OnFailure","error")all'interno dell'onSuccess solo per vedere se funziona.
+- Per utilizzare questa fun la chiamiamo nel viewModel, quindi per passare i dati nel ViewModel creo un'istanza della classe Service(val retrofiteService = RetrofiteService())
+ nel ViewModel e dentro la funzione loadContent passo i dati con un try catch, con il try passo se va bene i dati con l'istruzione retrofiteService.getDataFromApi()
+ e nel catch passo l'exception in caso non vengano passati i dati.
+- Per vedere nel logCat la risposta della chiamata di rete, esiste un protocollo okhttp, che inserendolo nel retrofit mi mostra la risposta nel logCat della chiamata di rete.
+- Come effettuare la chiamata effettiva, vedere il file .txt network, che spiega come utilizzare okhttp e retrofit.
+- Adesso ci servono effettivamente i dati dalla rete. Quindi faccio la richiesta del file json su PostMan o direttamente su http e ricevo il file json. Questo file lo converto
+ in classi o tramite plugin android studio o con il metodo si sasa spiegato su network.txt minuto 27:00 youtube. Cmq creo le classi di dati che dovrei ricevere.
+- Tutti i dati che ricevo da rete sono molti, posso creare un'altra classe con sltanto i dati che mi servono per avere la risposta di rete. Sasa crea una data class Gif con
+ soltanto i dati necessari per ottenere una risposta di rete. Quindi vedo cosa mi serve dalla risposta di rete e da dentro verso fuori inserisco in data class quello che mi serve.
+- Adesso voglio convertire le classi ricevute da rete in questa classe creata da me, perchè io voglio che questa classe creata da me non sappia nulla di comunicazione di rete, e 
+quindi devo creare una funzione all'interno del Service.
+- Creo nel Service:
+fun toGif(): Gif {
+            return Gif(
+                id = id,
+                original = Gif.Original(images.original.url),
+                preview = Gif.Preview(images.preview_gif.url)
+            )
+- Questo metodo trasforma i dati da rete in dati di classe Gif che ho creato io.
+- Adesso io creo le classi dei file json con i dati che ci arrivano. Fatto ciò, mi serve inviare i dati a ViewModel.
+- Creo un altra sealed Class GifResult() nel Service con 2 data class, Error e Success, che hanno come parametri rispettivamente:
+    data class Error(val error: Throwable) : GifResult()
+    data class Success(val gifs: List<Gif>) : GifResult()
+- e restituiscono qualcosa di tipo GifResult(). Quindi questo sarà il result che io poi passo a ViewModel, infatti ViewModel avrà error result e un success result.
+- Per passare questi risultati, creo un interfaccia che ha un metodo dove sarà passato il risultato a ViewModel:
+interface GifResultReceiver {
+    fun receive(result: GifResult)
+}
+- Adesso nel metodo getDataFromApi passerò come parametro un parametro del tipo di quest'interfaccia, nell'esempio di sasa:
+fun loadTrending(receiver: GifResultReceiver)
+
+- Infatti è il ViewModel che mi deve chiamare i dati tramite la fun getDataFromApi e gestisce all'interno del when i 2 casi di Error e di Success, così da impostare lo
+state.value nel modo corretto. Senza l'implementazione di queste 2 classi e dell'interfaccia che può essere poi richiamata e implementata non potremmo gestire i casi
+si success e di error. Per questo si creano le classi e l'interfaccia e si passa come paramentro nel la funzione che chiama i dati da rete.
+
+- In questo modo chiunque chiama questo metodo per caricare i dati dalla rete, deve passarmi questo receiver(parametro dell'interfaccia), così io dentro la fun load posso 
+ effettivamente passarmi i dati: receiver.receive(GifResult.Error(t)) nell'onFailure e nell'onSuccess avrò 2 dati da passare receiver.receive(GifResult.Success(gifList))
+ mi serve passare dentro success gifList, o nel mio caso una MoneyList tutto questo dove ho response.body()!=null mentre dove ho response.body()==null chiamo 
+receiver.receive(GifResult.Error(Throwable(response.errorBody().toString()))) devo passare un error di tipo Throwable - vedere data class GifResult 10 righe sopra-.
+- Adesso nell'OnSuccess, utilizzo la funzione che mi trasforma i dati di rete nella classe creata da me: fun toGif(): Gif
+- Quindi creo una val di tipo List<Gif>() e la passo nel Success in modo da passare i dati ottenuti da rete:
+- val gifList : List<Gif> = success.data.map { responseGif -> responseGif.toGif() }
+- receiver.receive(GifResult.Success(gifList))
+
+QUARTA LEZIONE YOUTUBE: https://www.youtube.com/watch?v=IY8iKzQYBwc&feature=youtu.be
+
+- Adesso all'interno del ViewModel nella fun loadContent chaimata nel try per inviare dati, abbiamo il nostro try(per provare a inviare i dati) catch(Throwable), nel try 
+dobbiamo implementare la nostra interfaccia. Gli passiamo un object di tipo della interfaccia, e la implementiamo e sovrascriviamo la sua fun receive che accetta 2 possibili
+result della classe GifResult, Success e Error. Facciamo il nostro when(result) e se result=Success modifichiamo lo state in state.value=GiphyState.Success(gifs = result.gifs),
+passando proprio la lista di gif appena convertita e nell'Error passiamo un error.
+- Adesso praticamente abbiamo finito. Dobbiamo prendere solo i dati nell'activity nel caso di success. Quindi creo una funzione showGif che accetta una lista di gif con un log.d
+che al momento mi mostra che i dati sono passati nel log. questa funzione la chiamo nell'observer when(state) is Success.
+- Adesso manca solo una recyclerView che mi passa la lista effettiva nell'Activity.
+- Creo l'adapter e lo collego all'activity

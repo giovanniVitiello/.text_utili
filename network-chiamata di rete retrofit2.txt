@@ -1,0 +1,72 @@
+Video youtube : https://www.youtube.com/watch?v=XzXRoF3FjcE
+-	https://www.youtube.com/watch?v=53BsyxwSBJk
+-	https://www.youtube.com/watch?v=RSYTn-O3r34
+Add dependencies
+Build with mvvm o mvp
+-create model from json api
+Search api in google
+Generate api in Postman
+Create new package model
+Create new data class in package model with plugin kotlin data class file from JSON
+Copy text json to generate data class qith annotation GSON  
+Create interface and inside create object with that call to network throut the retrofit:
+interface RetrofitService {
+    @GET("latest.json")
+    fun getEuroMoney(@Query("app_id") app_id : String, @Query("base") base : String) : Call<Money>
+
+    companion object{
+        fun create(): RetrofitService{
+            val retrofit = Retrofit.Builder()
+                .addConverterFactory(GsonConverterFactory.create())
+                .baseUrl("https://openexchangerates.org/api/")
+                .build()
+            return retrofit.create(RetrofitService::class.java)
+        }
+    }
+}
+
+Inside your Activity(ViewModel) get the data from api with this passages:
+internal fun getDataFromApi() {
+    val network = findViewById<TextView>(R.id.network)
+    RetrofitService.create()
+        .getEuroMoney("35160723af91450bb52cb10b2a3c88ba", "USD")
+        .enqueue(object : Callback<Money> {
+            override fun onResponse(call: Call<Money>, response: Response<Money>) {
+                if(response.code() == 200){
+                    val responses = response.body()
+                    val rates = responses?.rates
+                    val euro = rates?.eUR
+                    network.text = euro.toString()
+                }
+            }
+
+            override fun onFailure(call: Call<Money>, t: Throwable) {
+                network.text = "errore"
+                Toast.makeText(this@ConvertActivity, "error             loading",Toast.LENGTH_LONG).show()
+            }
+        })
+}
+
+json to generate data class with annotation GSON  
+Call the function getDataFromApi in your clickListner:
+val networButton = findViewById<Button>(R.id.callNetwork)
+networButton.setOnClickListener {getDataFromApi()}
+
+----------------------
+We can add the function okhttp interceptor to view the json file in the logcat. There are only 3 row to add:
+
+val interceptor: HttpLoggingInterceptor = HttpLoggingInterceptor().apply {
+                this.level = HttpLoggingInterceptor.Level.BODY
+            }
+            val client = OkHttpClient.Builder().addInterceptor(interceptor).build()
+
+And the :
+     .client(client) 
+
+in the val retrofit.
+
+So we can view the response in json file of the network. we can copy the adresse http://.... from the logcat, and paste in a server (curlbuilder)that 
+convert a json file.
+This server response with a linea di comando that we can insert in a git bash, and than we can save this code in a file
+minute 27:00 https://www.youtube.com/watch?v=naQ-GF2nSSc
+

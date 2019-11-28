@@ -1,0 +1,27 @@
+PASSAGGI PER LA NAVIGATION SU ANDROID:
+
+-Seguire l'app di riferimento navigationApplication
+-Prima di tutto inserire le dependencies ("https://codelabs.developers.google.com/codelabs/kotlin-android-training-add-navigation/index.html#2")
+-Aggiungere un NavigationGraph ("https://codelabs.developers.google.com/codelabs/kotlin-android-training-add-navigation/index.html#2")
+-Creare un BlankFragment solamente con l'xml incluso, deselezionare le altre 2 caselle
+-Aggiungere il BlankFragment alla NavigationGraph
+-Aggiungere il BlankFragment all'interno del layout del MainActivity
+-inserire le 3 voci della navigation:   android:name="androidx.navigation.fragment.NavHostFragment"
+					app:defaultNavHost="true"
+        				app:navGraph="@navigation/'nome_del_navigationGraph.xml' "
+-Se si vuole collegare un secondo fragment con il primo, creare un secondo fragment cosi come il primo
+-Aggiungere un button nell'xml del primo fragment
+-All'interno del primo fragment, nel file .kt, creare il collegamento tra il button e il secondo fragment all'interno del metodo onViewCreated con il seguente codice:
+	
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+       		 super.onViewCreated(view, savedInstanceState)
+       		 val button = view.findViewById<Button>(R.id.button)
+      		  button?.setOnClickListener {
+       		     findNavController().navigate(R.id.fragment2)      <!-- dove fragment2 è l'id del secondo fragment-->
+      		  }
+    	}
+-Oppure come spiegato nell'app navigationApplication dentro blankFragment.kt si può anche utilizzare direttamente l'onCreateView a patto di dichiarare prima la variabile view
+
+-Se si vuole collegare un terzo fragment, si fa esattamente allo stesso modo, solo che il metodo di sopra va scritto dentro il file del secondo fragment.kt
+-Al posto dell'id del fragment si possono usare gli id delle action(frecce), in modo da poter gestire i ritorni del button indietro attraverso le funzionalità di Pop behavior.
+-Si possono collegare allo stesso modo anche le activity, basta aggiungerle al file navigation.xml l'activity.
