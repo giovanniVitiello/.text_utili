@@ -19,6 +19,7 @@ git clone git@github.com:giovy10/dice_roll.git
 5-git push del progetto su remoto (git push origin(nome del mio origin) master(nome del branch))
 6-se si apportano modifiche da remoto per scaricarle in locale il comando è:
    git pull origin master.
+7-se si vuole aggiornare il proprio branch con un altro branch remoto(develop), dopo aver fatto git pull origin develop, fare git merge develop.
 
 --------------CREARE UN BRANCH E UNA PULL REQUEST------------
 
@@ -29,12 +30,21 @@ git clone git@github.com:giovy10/dice_roll.git
 5-git add . aggiungo i file in index pronti per essere committati
 6-git commit -m "" adesso il file è sulla cartella head locale
 7-git push del progetto su remoto (git push origin(nome del mio origin) feature/nome(branch))
-8-su remoto adesso avrò una pull request, che dovrà essere accettata
-9-dopo che è stata accettata, faccio il merge sul percorso master da remoto
-10-adesso faccio il git pull origin master e scarico il file nel master del locale
-11-mi ritroverò il file sul percorso master
-12-posso in teoria cancellare il percorso branch si prima
-13- il comando è : git branch -d feature/nome(branch)
+8-prima di fare pr vedere su git se è mergiabile, se non lo è fare:
+9-aggiorno il mio develop, quindi su bash faccio git checkout develop, e git pull origin develop
+10-mi risposto sul mio branch locale e faccio git merge develop
+11-ci saranno una serie di conflitti da sistemare
+12-vado su vsCode, clicco a sx sulla terza icona soureControl(3 pallini flow)
+13-clicco sul file viola e vedo i conflitti, li sistemo
+14-faccio Ctrl+s per salvare e poi gli do il + così lui fa commit(oppure direttamente il flag e lui fa il merge)
+14bis-torno su git e faccio git merge --continue, e poi Ctrl+o(credo), invio, e Ctrl+non ricordo) e finito. 
+
+15-su remoto adesso avrò una pull request, che dovrà essere accettata
+16-dopo che è stata accettata, faccio il merge sul percorso master da remoto
+17-adesso faccio il git pull origin master e scarico il file nel master del locale
+18-mi ritroverò il file sul percorso master
+19-posso in teoria cancellare il percorso branch si prima
+20- il comando è : git branch -d feature/nome(branch)
 
 
 

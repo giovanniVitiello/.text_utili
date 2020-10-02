@@ -1,0 +1,16 @@
+1. Creare cartella script da project (vedere UnitConverter).
+2. Dentro script creare 2 file:
+- detekt_config.yml (copiare file in UnitCoverter)
+- detekt_setup.gradle (copiare file in UnitCoverter)
+3. In build.gradle(:app) aggiungere: apply from: '../scripts/detekt_setup.gradle'
+4. In build.gradle(Project) aggiungere:
+- ext {
+        version_detekt = "1.4.0"
+- dependencies {
+        classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:$version_detekt"
+- repositories {
+        mavenCentral()
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+
+FINE

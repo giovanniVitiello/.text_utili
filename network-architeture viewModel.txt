@@ -1,8 +1,8 @@
 PRIMA LEZIONE YOUTUBE: https://www.youtube.com/watch?v=ObPPw7WWyUg&feature=youtu.be
 
 - Prima cosa, si dichiarano le sealed class Event e State nel ViewModel.
-- All'interno si mettono gli eventi(object Load : Event) e nella classe State gli stati (object onProgress-Success-Error)
-- Si scrive una funzione che manda gli eventi nell'activity esempio: fun send(event: Event) {
+- All'interno si mettono gli eventi(object Load : Event) e nella classe State gli stati (object inProgress-Success-Error)
+- Si scrive una funzione nell'activity che manda gli eventi esempio: fun send(event: Event) {
         when (event) {
             Event.Load -> TODO()
         }
@@ -20,7 +20,7 @@ inProgress-Success-Error..e in funzione dello stato do le istruzioni da eseguire
 
 SECONDA LEZIONE YOUTUBE: https://www.youtube.com/watch?v=IhROPBJEDsI&feature=youtu.be
 
-- Solitamente adesso si procede così, si coprono tutti gli altri stati più semplici(Error) ed infine si implemente il caso del caricamento dati, che è il più lungo.
+- Solitamente adesso si procede così, si coprono tutti gli altri stati più semplici(Error) ed infine si implementa il caso del caricamento dati, che è il più lungo.
 - Quindi creo la funzione showError, che è semplicemente uno snackbar con un retry, e lo passo nel when(state) nel caso state is State.Error
 - Nella fun showError passo come parametro un error:Throwable
 - Nel ViewModel, quindi adesso dobbiamo adesso coprire il caso dell'errore, quindi sotto il state.vale=State.Progress, nella funzione loadContent, devo implementare 
@@ -53,7 +53,7 @@ TERZA LEZIONE YOUTUBE: https://www.youtube.com/watch?v=naQ-GF2nSSc
 - Come effettuare la chiamata effettiva, vedere il file .txt network, che spiega come utilizzare okhttp e retrofit.
 - Adesso ci servono effettivamente i dati dalla rete. Quindi faccio la richiesta del file json su PostMan o direttamente su http e ricevo il file json. Questo file lo converto
  in classi o tramite plugin android studio o con il metodo si sasa spiegato su network.txt minuto 27:00 youtube. Cmq creo le classi di dati che dovrei ricevere.
-- Tutti i dati che ricevo da rete sono molti, posso creare un'altra classe con sltanto i dati che mi servono per avere la risposta di rete. Sasa crea una data class Gif con
+- Tutti i dati che ricevo da rete sono molti, posso creare un'altra classe con soltanto i dati che mi servono per avere la risposta di rete. Sasa crea una data class Gif con
  soltanto i dati necessari per ottenere una risposta di rete. Quindi vedo cosa mi serve dalla risposta di rete e da dentro verso fuori inserisco in data class quello che mi serve.
 - Adesso voglio convertire le classi ricevute da rete in questa classe creata da me, perchè io voglio che questa classe creata da me non sappia nulla di comunicazione di rete, e 
 quindi devo creare una funzione all'interno del Service.
