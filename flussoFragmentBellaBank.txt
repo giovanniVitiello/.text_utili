@@ -1,0 +1,29 @@
+			TOOLBAR FRAGMENT
+protected abstract FragmentToolbar builder()-> viene esteso da tutti i sotto fragment e serve per creare la toolbar con il costruttore Builder
+				|
+			BASE FRAGMENT
+implementa per primo il builder() metodo senza una toolbar.
+public abstract int getLayoutResource();-> serve per prendere il layout di riferimento in ogni fragment
+public abstract String getTAG(); -> indica il nome della classe, usato per il LOG
+				|
+		TUTTI I FRAGMENT PER LA NAVIGAZIONE
+Tutti implementano i 3 metodi sopra, per definire toolbar, layout e nome classe.
+I metodi chiamati per prima in ogni fragment, sono gli override di questi 3 metodi. Dopo di questi si inizia con i classici OnCreate->OnViewCreated..
+Il flusso seguito dai fragment dipende dalla navigation sotto la cartella navigation.
+Abbiamo 5 flussi di navigation:
+- il primo è l'onBoarding_graph.xml, che serve per la registrazione.
+- finita la registrazione si torna alla pagina di login, e si segue la navigation del file main_app_graph.xml
+
+QUI ABBIAMO UN ALTRO BASE FRAGMENT DAL QUALE ESTENDONO I FRAGMENT DEL LOGIN CHE SONO 2 LoginFragment e SplashFragment CHE SI CHIAMA:
+	
+			BASE_LOGIN FRAGMENT
+Il metodo protected void autologin(String email, String password) -> dichiarato nel BASE_LOGIN FRAGMENT, che viene sovrascritto da LoginFragment e SplashFragment, 
+viene automaticamente loggato o mandato sul login l'utente a seconda se aveva fatto logout oppure no precedentemente, infatti qui vengono salvati email e password 
+nelle sharedPref. 
+
+Ricapitolando: si parte da MainActivity che fa partire SplashFragment, ma SplashFragment extends BaseLoginFragment che extends BaseFragment che extends ToolbarFragment,
+quindi il flusso è il seguente:
+ToolbarFragment -> BaseFragment -> BaseLoginFragment -> SplashFragment.
+Quindi prima i metodi di ToolbarFragment implementati in BaseFragment -> {builder()}
+Poi i metodi di BaseFragment implementati in BaseLoginFragment -> {}
+Poi i metodi di BaseLoginFragment e ToolbarFragment implementati in SplashFragment. -> {builder() , getLayoutResource(), getTAG(), autologin(String email, String password)}
