@@ -1,0 +1,29 @@
+- si fa pr dell'aggiornamento versionName e versionCode 
+	{gradle(app) o Dependencies:
+	const val versionCode = 8 //used for local builds, CI uses codes used for published versions
+        const val versionName = "2.1.0" }
+- vai su bitrise (APP & ARTIFACTS) e scarichi app-release.apk
+- vai su play console
+- vai su app release
+- release to internal test track
+- create release
+- carichi l'apk al centro (Android App Bundles and APKs to add) BROWSE FILES
+- copy from previous release
+- copy last release info
+- save
+- review 
+- start rollout to internal
+- lanciata questa si va su release to beta
+- in automatico copia le info da internal
+- review 
+- start rollout to beta
+- si aspetta in pre-launching report che faccia il check
+- in un oretta finisce il check (si controlla che non ci siano bug crash numero errors), si torna su app release e si clicca su release to production
+- review 
+- start rollout to production
+-FINE
+
+FILE MAPPING
+- Android vitails
+- deobfuscation files
+- upload il mapping in the first version

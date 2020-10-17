@@ -1,0 +1,17 @@
+branch 2188
+fragmentSplash
+
+<include
+        android:id="@+id/includeToolbar"
+        layout="@layout/custom_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dp_16"
+        android:layout_marginEnd="@dimen/dp_16"
+        android:visibility="gone"/>
+
+
+branch 2216
+KeyUtils
+
+505 -> public static final int MIN_SENSITIVITY_VALUE = 5;

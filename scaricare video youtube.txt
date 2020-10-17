@@ -1,0 +1,5 @@
+- Copiare url del video
+- Aprire vlc->media->flusso di rete->rete ed incollare l'url->riproduci
+- Anciamo su Strumenti->informazioni codificatore e copiamo la stringa in fondo
+- Copiamo la stringa su chrome e si aprirà il video su chrome
+- 3 Pallini in basso e scarichiamo..
