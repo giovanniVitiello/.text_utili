@@ -1,0 +1,33 @@
+Prima si crea un BaseAdapter il quale tutti gli adapter estendono.
+
+In quest adapter crea un oggetto dell'interfaccia, l'interfaccia con il metodo onItemClicked ed un metodo che inizializza l'oggetto :
+
+- protected OnItemClickListener<T> onItemClickListener;
+
+- public interface OnItemClickListener<T> {
+        void onItemClicked(int position, T item);
+    }
+
+- public void setOnItemClickListener(OnItemClickListener<T> onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
+    }
+
+
+Nelle singole Screen inizializza un oggetto di questa interfaccia passando una lambda al metodo del BaseAdapter che inizializza l'oggetto interfaccia:
+
+quickOptionAdapter.setOnItemClickListener((position, item)-> {})
+
+Poi ogni volta che l'adapter chiama un onClick su un item:
+
+- itemView.setOnClickListener(v -> {
+                if (onItemClickListener != null) {
+                    onItemClickListener.onItemClicked(position, item);
+                }
+            });
+
+viene chiamato il metodo dell'interfaccia del base adapter (public interface OnItemClickListener<T>).
+
+A seconda di quale Screen abbia inizializzato questo oggetto con la lambda, quando viene chiamato questo onItemClicked, viene implementata la rispettiva 
+lambda che lo aveva inizializzato, ad esempio se l'oggetto onItemClickListener viene chiamato e inizializzato nell'HomeFragment, poi nel momento che io clicco
+sull'item e viene chiamato il metodo dell'adapter {onItemClickListener.onItemClicked(position, item)}, allora viene implementata la lambda scritta nell'HomeFragment,
+essendo onItemClickListener (l'oggetto interfaccia) con una lambda di tipo HomeFragment.
