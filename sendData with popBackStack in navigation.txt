@@ -1,0 +1,28 @@
+Fragment ricevente:
+
+ override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+       super.onViewCreated(view, savedInstanceState)
+        val result = this.getNavigationResultLiveData<String>("argumentsFeatureSavedModel")
+       result?.observe(viewLifecycleOwner, Observer { showData(result.value) })
+   }
+
+   private fun showData(jsonFeature: String?) {
+        feature = gson.fromJson(jsonFeature, Feature::class.java)
+   }
+
+Fragment che manda col popBackStack:
+
+this.setNavigationResult(featureJson, "argumentsFeatureSavedModel")
+
+Funzioni da usare:
+
+fun <T> Fragment.getNavigationResult(key: String = "result") =
+    findNavController().currentBackStackEntry?.savedStateHandle?.get<T>(key)
+
+fun <T> Fragment.getNavigationResultLiveData(key: String = "result") =
+    findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<T>(key)
+
+fun <T> Fragment.setNavigationResult(result: T, key: String = "result") {
+    findNavController().previousBackStackEntry?.savedStateHandle?.set(key, result)
+    findNavController().popBackStack()
+}
