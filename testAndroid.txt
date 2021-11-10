@@ -1,0 +1,15 @@
+In Android abbiamo i seguenti test:
+unitTest
+IntegrationTest
+End-to-end test
+
+unitTest sono i test che coinvolgono i singoli componenti delle app, come singole classi, o singile funzioni 
+di una classe. Questi testano la logica delle funzioni ad esempio. Non necessitano quindi di componenti 
+Android ma basta la JVM per eseguirli. Essi dovrebbero coprire circa il 70% dei test della ns app.
+
+IntegrationTest sono test che coinvolgono l'integrazione di 2 o più classi contemporaneamente, come UI(Activity/fragm)
+e altre classi come i VM, essi necessitano delle componenti android e quindi serve un emulatore o un device per eseguilri.
+Coprono solitamente il 20% della ns app.
+
+End-to-end invece sono dei test molto più grandi, e dovrebbero testare il reale comportamento di un utente con
+la nostra app. Essi dovrebbero coprire il 10% della nostra app.

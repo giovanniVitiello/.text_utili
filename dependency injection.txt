@@ -1,0 +1,16 @@
+Quando in app abbiamo un componente che serve in più punti dell'app di livello più basso, 
+ad esempio repository(db/interfaccia tra chiamata di rete e viewModel) oppure un backend(service) o un viewmodel,
+allora grazie alla dep.inj. possiamo iniettare queste dipendenze nell'app creando un astrazione maggiore a livello
+di dipendenza. Quindi invece di far dipendere tutte le classi dallo stesso componente(repository ad esempio) si fa
+l'inversione del controllo, quindi mi serve quel componente, faccio by inject e lo ottengo, senza farlo dipendere direttamente.
+In questo modo basta fare by inject nella classe che ha bisogno di quel componente, che in automatico
+la dipendenza viena passata al componente senza che questo conosca effettivamente cosa gli serve per quella dipendenza,
+quindi creiamo un layer di astrazione in più ed inoltre abbiamo la possibilità di testare eventualmente quella classe
+passanndo un valore mockato di quella dipendenza.
+
+Quindi d.i. serve per evitare di avere troppe dipendenze di un singolo componente per tutta l'app, e quindi astrarre tramite un
+interfaccia che ci injetta le dipendenze senza che la classe sappia effettivamente quale sia l'implementazione.
+
+Quindi l'implementazione è abbastanza semplice, una volta che si crea una classe nuova, invece di chiamarla a mano si registra in
+un punto centrale dell'app e da li si fa l'inject dove questa viene richiesta, creando quindi una dipendenza non diretta e
+una inversione del controllo.
