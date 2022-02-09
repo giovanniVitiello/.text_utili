@@ -1,0 +1,15 @@
+Step 3.a: First step is start tcpip on port 5555
+
+- adb tcpip 5555
+
+Remove USB cable and pass the following command
+
+- adb kill-server && adb connect 192.168.124.23
+
+To connect the phone wirelessly using a hotspot, first find the IP address
+ and pass the below command, and you’re ready to use your device without any Cable.
+ 
+- adb connect 192.168.....
+
+Recording video:
+scrcpy --record file.mp4 sotto utenti\giova

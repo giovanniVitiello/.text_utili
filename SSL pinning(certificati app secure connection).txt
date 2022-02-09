@@ -1,0 +1,196 @@
+https://mailapurvpandey.medium.com/ssl-pinning-in-android-90dddfa3e051 (APRIRE IN PRIVATE)
+
+Spiegazione per una connessione sicura in app bancarie, tra app e server remoti (BE).
+
+Che cos'è SSL?
+SSL è l'acronimo di Secure Sockets Layer. SSL è la tecnologia di sicurezza standard per 
+stabilire un collegamento crittografato tra un client e un server. Questo collegamento 
+garantisce che tutti i dati passati tra il server Web e il browser rimangano privati.
+
+Questi due sistemi possono essere un server (il nostro server backend) e un client 
+(la nostra app Android) o un server e un altro server (il nostro server backend che interagisce con un altro server).
+Questo è il protocollo crittografico più diffuso per fornire un canale di comunicazione sicuro.
+
+In che modo SSL garantisce la sicurezza dei dati?
+Un attacco Man-in-the-Middle si verifica quando un utente malintenzionato si posiziona tra 
+il server/host e il client, impersonando uno di essi. In altre parole, quando il client si 
+connette al server, in realtà ha a che fare con l'hacker e viceversa. Pertanto, sebbene il 
+client "pensi" di aver stabilito una connessione crittografata con il server, ma in realtà 
+entrambi stanno effettivamente "parlando" con l'attaccante che può visualizzare e modificare
+ i dati. Per questo motivo, tutti lo chiamano un attacco "Man-in-the-Middle".
+ 
+SSL crittografa i dati trasmessi in modo che una terza parte o qualsiasi "Man-in-the-Middle" 
+non possa "intercettare" la trasmissione e visualizzare i dati trasmessi. Solo il client e il 
+server sicuro sono in grado di riconoscere e comprendere i dati. Ciò significa che chiunque 
+cerchi di intercettare questi dati vedrà solo un mix confuso di caratteri che è quasi impossibile
+ da decifrare.
+Questa tecnica deriva dal concetto di Certificato SSL e dall'infrastruttura dell'Autorità di 
+Certificazione. Si basa sull'utilizzo della chiave privata, che stabilisce una connessione 
+valida quando è associata al certificato corrispondente. Questo avvia un processo di 
+autenticazione chiamato handshake tra due dispositivi comunicanti per garantire che entrambi 
+i dispositivi siano davvero chi affermano di essere. SSL firma anche digitalmente i dati al 
+fine di fornire l'integrità dei dati, verificando che i dati non vengano manomessi prima di 
+raggiungere il destinatario previsto.
+
+Cos'è SSL Pinning e come ottenerlo?
+Il pinning SSL è un processo di associazione di un host al certificato X509 o alla chiave 
+pubblica prevista. Una volta che un certificato o una chiave pubblica è noto o visualizzato 
+per un host, il certificato o la chiave pubblica viene associato o "aggiunto" all'host. Se 
+più di un certificato o di una chiave pubblica sono accettabili, l'identità annunciata deve 
+corrispondere a uno degli elementi del set di conti certificati. Ciò consente all'applicazione 
+di considerare attendibili solo i certificati validi o predefiniti o le chiavi pubbliche. 
+Dovremmo usare la tecnica di pinning SSL come livello di sicurezza aggiuntivo per il traffico 
+delle applicazioni e per convalidare l'identità dell'host remoto. Se non implementiamo SSL 
+Pinning, l'applicazione considera attendibile il certificato personalizzato e consente agli 
+strumenti proxy di intercettare il traffico.
+Questo può essere ottenuto in 3 modi: Certificate Pinning, Public Key Pinning e Hash Pinning.
+
+Aggiunta del certificato
+L'aggiunta del certificato è più facile da ottenere. Possiamo archiviare il certificato nella 
+nostra applicazione e quando il certificato scade, aggiorneremo la nostra applicazione con il 
+nuovo certificato. In fase di esecuzione, recuperiamo il certificato del server nel callback. 
+All'interno del callback, confrontiamo il certificato recuperato con il certificato incorporato 
+nella nostra app. Se corrisponde, possiamo fidarci dell'host altrimenti lanceremo un errore di 
+certificato SSL.
+Tuttavia, c'è un aspetto negativo nell'aggiunta di un certificato. Ogni volta che il nostro 
+server ruota il certificato, dobbiamo aggiornare la nostra applicazione. Quindi, se il server 
+ruota il suo certificato su base frequente, anche la nostra applicazione dovrebbe essere 
+aggiornata frequentemente.
+
+Aggiunta di chiavi pubbliche
+Il blocco della chiave pubblica è più flessibile da ottenere, ma un po 'più complicato in 
+quanto richiede alcuni passaggi aggiuntivi necessari per estrarre la chiave pubblica da un 
+certificato. In questo approccio, generiamo una coppia di chiavi, inseriamo la chiave privata 
+nel nostro server e la chiave pubblica nella nostra app. E proprio come nel blocco del certificato, 
+controlliamo la chiave pubblica estratta con la sua copia incorporata della chiave pubblica. 
+Se corrisponde, possiamo fidarci dell'host altrimenti lanceremo un errore di certificato SSL. 
+Utilizzando il blocco della chiave pubblica, possiamo evitare frequenti aggiornamenti 
+dell'applicazione poiché la chiave pubblica può rimanere la stessa per periodi più lunghi.
+Tuttavia, ci sono due aspetti negativi del blocco della chiave pubblica. Innanzitutto, 
+è più difficile lavorare con le chiavi poiché comporta il processo di estrazione della 
+chiave dal certificato. In secondo luogo, la chiave è statica e può violare i criteri di 
+rotazione delle chiavi.
+
+Hash Pinning
+In Hash Pinning, aggiungiamo l'hash della chiave pubblica del certificato del nostro server 
+e lo abbiniamo all'hash della chiave pubblica del certificato ricevuto durante una richiesta 
+di rete. Questa tecnica è più complessa di altre, ma ne vale la pena. Dopo aver ottenuto il 
+certificato, possiamo eseguirne l'hashing con qualsiasi algoritmo di hashing che preferiamo 
+(assicurati solo che sia un algoritmo sicuro). In questo modo viene fornito l'anonimato a un 
+certificato o a una chiave pubblica. Personalmente preferisco SHA-256 per hash la mia chiave. 
+Dopo aver calcolato l'hash, l'ho semplicemente codificato con la codifica Base64, per renderlo 
+più facile da memorizzare e leggere.
+
+Modi per implementare SSL Pinning in Android
+
+(a) TrustManager -> APP POSTE
+TrustManager è responsabile di decidere se l'app deve accettare o meno le credenziali inviate 
+dall'host. Questa interfaccia proviene dal pacchetto javax.net.ssl
+
+I passi da seguire sono -
+Aggiungi il file del certificato all'app.
+Possiamo aggiungerlo all'interno della directory res o nella directory delle risorse
+
+2. Caricare KeyStore con il file del certificato come InputStream e creare un Keystore. 
+Dal momento che l'ho memorizzato all'interno della directory res, lo caricherò da lì.
+
+val inputStream = resources.openRawResource(R.raw.my_cert)
+val keyStoreType = KeyStore.getDefaultType()
+val keyStore = KeyStore.getInstance(keyStoreType)
+keyStore.load(inputStream, null)
+
+3. Creare un TrustManager.
+
+val tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm()
+val trustManagerFactory = TrustManagerFactory.getInstance(tmfAlgorithm)
+trustManagerFactory.init(keyStore)
+
+4. Crea SSLContext che utilizza il nostro TrustManager e comunica a URLConnection di utilizzare 
+   un SocketFactory dal nostro SSLContext
+   
+val sslContext = SSLContext.getInstance("TLS")
+sslContext.init(null, trustManagerFactory.trustManagers, null)
+val url = URL("http://www.yourdomain.com/")
+val urlConnection = url.openConnection() as HttpsURLConnection
+urlConnection.sslSocketFactory = sslContext.socketFactory
+
+Questa tecnica richiede l'interazione diretta con l'API del framework. Ciò significa che 
+l'implementazione è condotta a un livello piuttosto basso. Quindi, dovremmo stare molto attenti.
+
+(b) OkHttp e CertificatePinner (OkHttp and CertificatePinner)-> APP BELLA BANK
+L'aggiunta di certificati tramite OkHttp è semplice, in quanto richiede solo la creazione di 
+un'istanza di CertificatePinner utilizzando un builder dedicato con le impronte digitali 
+corrispondenti. Le impronte digitali devono essere hardcoded nell'app o possiamo iniettare 
+tali chiavi durante il processo di compilazione, usando il metodo buildConfigField. Quindi, 
+è necessario creare un'istanza OkHttpClient con CertificatePinner.
+
+I passi da seguire sono -
+
+val certificatePinner = CertificatePinner.Builder()
+    .add(
+        "www.yourdomain.com",
+        "sha256/ZCOF65ADBWPDK8P2V7+mqodtvbsTRR/D74FCU+CEEA="
+    )
+    .build()
+val okHttpClient = OkHttpClient.Builder()
+    .certificatePinner(certificatePinner)
+    .build()
+	
+Possiamo aggiungere più impronte digitali per domini diversi. Le impronte digitali 
+possono essere recuperate direttamente dal certificato.
+Sfortunatamente le prime versioni presentano una vulnerabilità nel CertificatePinner di OkHttp, 
+quindi dovremmo usare almeno OkHttp 3.2.0 o OkHttp 2.7.5.
+
+(c) Pinning con Retrofit (Pinning with Retrofit)
+(d) Configurazione della sicurezza di rete(Network Security Configuration)
+
+Quale certificato dovremmo appuntare nella catena?
+La nostra scelta del certificato influisce sul livello di sicurezza che raggiungiamo, 
+diminuendo man mano che raggiungi il certificato root. Quindi è importante per noi scegliere 
+con attenzione. Una catena di certificati è un elenco ordinato di certificati, contenente un 
+certificato SSL e certificati dell'autorità di certificazione (CA), che consentono al 
+destinatario di verificare che il mittente e tutte le CA siano affidabili. La catena o 
+il percorso inizia con il certificato SSL e ogni certificato nella catena è firmato dall'entità 
+identificata dal certificato successivo nella catena.
+Qualsiasi certificato che si trova tra il certificato Leaf/SSL e il certificato radice è 
+chiamato catena o certificato intermedio. Il certificato CA radice è il firmatario/emittente 
+del certificato intermedio. Il certificato intermedio è il firmatario/emittente del 
+certificato SSL.
+Se il certificato intermedio non è installato sul server (dove è installato il certificato SSL) 
+potrebbe impedire ad alcuni browser, dispositivi mobili, applicazioni, ecc. di considerare 
+attendibile il certificato SSL. Per rendere il certificato SSL compatibile con tutti i client, 
+è necessario installare il certificato intermedio. La catena termina con un certificato CA radice. 
+Il certificato CA radice è sempre firmato dalla CA stessa. Le firme di tutti i certificati della 
+catena devono essere verificate fino al certificato CA radice.
+Tutti insieme, formano la catena di fiducia SSL, un elenco ordinato di certificati che 
+consentono al destinatario (la nostra app) di verificare che l'host (il nostro server sicuro) 
+e la CA siano affidabili. Se manca un componente della catena, il destinatario non si fiderà 
+del certificato SSL del server e emetterà un avviso HTTPS.
+
+Certificato SSL / Leaf - 
+Appuntando il nostro certificato foglia stiamo garantendo con certezza quasi al 100% che 
+questo è il nostro certificato e quindi la catena è valida. I certificati foglia tendono 
+ad avere un breve tempo di scadenza e se, ad esempio, i certificati SSL vengono riemessi 
+perché la chiave privata è compromessa, la nostra app verrà bloccata fino a quando non 
+saremo in grado di inviare un aggiornamento. Naturalmente lo stesso può essere vero anche 
+se si riciclano frequentemente i certificati.
+
+Certificato intermedio — Bloccando il certificato intermedio ci fidiamo che l'autorità di 
+certificazione intermedia non emetta erroneamente un certificato per i nostri server. 
+Questo ha anche il vantaggio che finché ci atteniamo allo stesso provider di certificati, 
+qualsiasi modifica ai nostri certificati foglia funzionerà senza dover aggiornare la nostra app.
+
+Certificato radice: bloccando il certificato radice, ci fidiamo dell'autorità di certificazione 
+radice e di tutti gli intermediari di cui si fidano per non emettere erroneamente certificati. 
+Spesso le autorità di base e intermedie sono la stessa azienda, nel qual caso non c'è molta 
+differenza nel numero di persone di cui ci fidiamo, tuttavia non è sempre così.
+
+Conclusione
+Senza l'aggiunta del certificato, un'applicazione accetta in genere qualsiasi certificato 
+che corrisponda al nome host richiesto e sia emesso da una CA (autorità di certificazione) 
+localmente attendibile. Poiché di solito ci sono più di 100 CA nel negozio di fiducia locale, 
+c'è una buona possibilità che una di queste venga attaccata con successo. Quindi ha senso 
+limitare il certificato che accetti a uno specifico. Quindi, il pinning SSL aiuta a creare 
+applicazioni mobili sicure, ma non proteggerà le connessioni se l'host bloccato è compromesso. 
+Protegge principalmente il client, ma aiuta anche a proteggere i server rendendo più difficile 
+per gli hacker curiosare sul traffico e capire la tua API e sfruttare altre falle di sicurezza.
