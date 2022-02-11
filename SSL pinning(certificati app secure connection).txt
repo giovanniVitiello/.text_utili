@@ -8,7 +8,8 @@ stabilire un collegamento crittografato tra un client e un server. Questo colleg
 garantisce che tutti i dati passati tra il server Web e il browser rimangano privati.
 
 Questi due sistemi possono essere un server (il nostro server backend) e un client 
-(la nostra app Android) o un server e un altro server (il nostro server backend che interagisce con un altro server).
+(la nostra app Android) o un server e un altro server (il nostro server backend che interagisce 
+con un altro server).
 Questo è il protocollo crittografico più diffuso per fornire un canale di comunicazione sicuro.
 
 In che modo SSL garantisce la sicurezza dei dati?

@@ -1,0 +1,29 @@
+Definizione di Job
+
+Secondo la documentazione ufficiale, la definizione di un Job è data come segue:
+
+Un Job è una cosa cancellabile con un ciclo di vita che culmina nel suo completamento. 
+Il Job Coroutine viene creato con il launch coroutine builder. Esegue un blocco di 
+codice specificato e viene completato al completamento di questo blocco.
+
+Come ottenere il Job?
+Poiché viene discusso che un Job verrà restituito quando verrà avviata una nuova coroutine, 
+quindi ora vediamo a livello di codice come viene restituito il Job e come il Job può essere 
+utilizzato.
+
+		// A job is returned
+        val job = CoroutineScope.launch(Dispatchers.Default) {..}
+
+Definizione di Deferred
+
+E' un Job che però ha un risultato.
+Per ottenere il risultato di un Deferred è disponibile quando è completato e può essere 
+recuperato con il metodo await, che genera un'eccezione se il Deferred non è riuscito.
+
+someScope.launch {
+    val userJob: Deferred<User> = async(IO) { repository.getUser(id) }
+    //some operations, while user is being retrieved 
+    val user = userJob.await() //here coroutine will be suspended for a while, and the 
+								 method `await` is available only from `Deferred` interface
+    //do the job with retrieved user
+}
